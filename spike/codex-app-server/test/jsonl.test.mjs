@@ -1,0 +1,4 @@
+import test from "node:test"; import assert from "node:assert/strict"; import { JsonlDecoder } from "../src/jsonl.mjs";
+test("decodes a frame split across chunks", () => { const decoder = new JsonlDecoder(); assert.deepEqual(decoder.push(Buffer.from('{"id":')), []); assert.deepEqual(decoder.push(Buffer.from('1}\n')), [{ ok: true, value: { id: 1 } }]); });
+test("decodes multiple frames from one chunk", () => { const decoder = new JsonlDecoder(); assert.deepEqual(decoder.push(Buffer.from('{"id":1}\n{"id":2}\n')), [{ ok: true, value: { id: 1 } }, { ok: true, value: { id: 2 } }]); });
+test("isolates malformed and oversized frames", () => { const decoder = new JsonlDecoder({ maxFrameBytes: 12 }); assert.deepEqual(decoder.push(Buffer.from("bad\n")), [{ ok: false, error: "invalid_json" }]); assert.deepEqual(decoder.push(Buffer.from("x".repeat(13))), [{ ok: false, error: "frame_too_large" }]); });

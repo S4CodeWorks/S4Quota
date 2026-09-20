@@ -1,0 +1,11 @@
+{
+  "name": "s4quota-codex-app-server-spike",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "probe": "node src/cli.mjs probe",
+    "observe": "node src/cli.mjs observe",
+    "cross-process": "node src/cli.mjs cross-process"
+  }
+}
