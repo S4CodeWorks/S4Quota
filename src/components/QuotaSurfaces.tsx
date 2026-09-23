@@ -35,11 +35,12 @@ function CompactIcon() {
 function WindowChrome({ mode, onSwitch, onWindowAction }: { mode: "main" | "compact"; onSwitch: () => void; onWindowAction: (action: WindowAction) => void }) {
   return (
     <header className={`s4-window-chrome s4-window-chrome--${mode}`}>
-      <div className="s4-window-brand" data-tauri-drag-region>
+      <div className="s4-window-brand" data-tauri-drag-region="deep">
         <img src={markSmall} alt="" aria-hidden="true" />
         {mode === "main" && <span>S4Quota</span>}
       </div>
-      <nav className="s4-window-controls" aria-label="Window controls">
+      <div className="s4-window-drag-space" data-tauri-drag-region aria-hidden="true" />
+      <nav className="s4-window-controls" data-tauri-drag-region="false" aria-label="Window controls">
         {mode === "main" && (
           <>
             <button className="s4-window-control s4-focus-target" type="button" aria-label="Minimize window" onClick={() => onWindowAction("minimize")}><MinusIcon /></button>

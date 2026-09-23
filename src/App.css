@@ -46,6 +46,14 @@ button {
   padding-inline: var(--s4-space-4);
   color: var(--s4-text-primary);
   cursor: default;
+  app-region: drag;
+}
+
+.s4-window-drag-space {
+  flex: 1 1 auto;
+  align-self: stretch;
+  min-width: 0;
+  app-region: drag;
 }
 
 .s4-window-chrome--compact .s4-window-brand {
@@ -68,6 +76,7 @@ button {
   display: flex;
   height: 100%;
   align-items: stretch;
+  app-region: no-drag;
 }
 
 .s4-window-control {

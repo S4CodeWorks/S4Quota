@@ -70,3 +70,50 @@ shows Main; `Compact Mode` explicitly selects and shows Compact. Only the tray
 Quit action requests graceful ProviderManager shutdown before the app exits.
 Operating-system session exit is not intercepted as a close-to-tray action;
 Windows Job Object kill-on-close remains the final child-process safeguard.
+
+## Window preferences
+
+Native window preferences are owned and written by Rust/Tauri, independently
+of React rendering. The versioned JSON file is
+`app_config_dir()/window-state.json` (on Windows, under the current user's
+application configuration directory). It contains only `version`,
+`lastVisibleMode`, and separate Main and Compact placement records; it never
+contains provider state, quota values, account identity, or credentials.
+
+`lastVisibleMode` means the last selected visible surface (`main` or
+`compact`), not the runtime visibility state. `TrayOnly` is session-only and
+is not serialized. Startup restores the saved visible mode even if the prior
+session ended from TrayOnly or while minimized. A single-instance activation
+continues to select Main without reapplying startup geometry.
+
+Main position offsets and client dimensions are stored in logical pixels
+relative to the source monitor's work-area origin. Compact stores only its
+position; its size remains the canonical 304 × 120 logical pixels. Tauri
+reports native positions and sizes in physical pixels, so capture divides
+offsets and dimensions by that monitor's scale factor. Restore multiplies
+logical values by the selected monitor's current scale factor before applying
+physical bounds. The document also records a monitor fingerprint (name when
+available, display/work-area dimensions and origin, and scale factor), but no
+single identifier is trusted by itself.
+
+Restore first matches the monitor fingerprint, then chooses the available
+work area with the largest intersection against the old placement, then the
+primary monitor (or first valid monitor). Bounds are clamped to the selected
+work area; if it is smaller than Main's minimum size, the window's top-left
+titlebar origin is kept accessible. Invalid/corrupt bounds are ignored, and an
+unsupported future schema is not overwritten. Main's normal bounds are saved
+separately from its maximized flag; maximizing never replaces those normal
+bounds. Minimized bounds are not saved.
+
+Move/resize/scale events schedule a debounced capture and disk write, avoiding
+transient bounds emitted while maximizing. The custom maximize action also
+captures normal bounds before requesting native maximization. Mode changes
+schedule a save, while graceful Quit takes a final capture and attempts an
+immediate write. Persistence errors are diagnostic only and do not block
+shutdown.
+
+The official `tauri-plugin-window-state` was evaluated for this role. Its
+global state flags and physical-pixel window records would need additional
+per-window handling for fixed-size Compact and explicit scale conversion for
+mixed-DPI restoration. S4Quota keeps its dedicated versioned preferences module
+for those policies; it does not persist `VISIBLE`, minimized, or TrayOnly.

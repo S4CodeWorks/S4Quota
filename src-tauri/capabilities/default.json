@@ -3,5 +3,5 @@
   "identifier": "default",
   "description": "Minimal capability for the main and compact surfaces",
   "windows": ["main", "compact"],
-  "permissions": ["core:default"]
+  "permissions": ["core:default", "core:window:allow-start-dragging"]
 }
