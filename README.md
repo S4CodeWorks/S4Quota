@@ -69,9 +69,9 @@ S4Quota reuses the existing Codex sign-in through the local App Server. It does 
 
 ## Project status
 
-**Implemented:** Codex provider and real five-hour/weekly quota data; Main and Compact surfaces; Light and Dark themes; manual refresh and polling; Windows MSI and NSIS installers plus a portable executable.
+**Implemented:** Codex provider and real five-hour/weekly quota data; Main and Compact surfaces; Light and Dark themes; manual refresh, polling, and system tray lifecycle; Windows MSI and NSIS installers plus a portable executable.
 
-**Planned:** tray integration, autostart, final geometry persistence, release hardening, and additional providers.
+**Planned:** autostart, final geometry persistence, release hardening, and additional providers.
 
 ## Development
 

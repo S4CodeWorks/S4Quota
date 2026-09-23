@@ -59,3 +59,14 @@ The current product requirements and visual rules remain in
 [PRODUCT.md](../PRODUCT.md) and [DESIGN.md](../DESIGN.md); the approved
 surface composition is recorded in
 [`.impeccable/surfaces/main-compact.md`](../.impeccable/surfaces/main-compact.md).
+
+## Resident lifecycle
+
+The native tray owns `Open S4Quota`, `Compact Mode`, `Refresh`, and
+`Quit S4Quota`. Main/Compact selection is stored separately from surface
+visibility, so closing either surface enters `TrayOnly` without changing the
+selected mode or stopping the provider. `Open S4Quota` explicitly selects and
+shows Main; `Compact Mode` explicitly selects and shows Compact. Only the tray
+Quit action requests graceful ProviderManager shutdown before the app exits.
+Operating-system session exit is not intercepted as a close-to-tray action;
+Windows Job Object kill-on-close remains the final child-process safeguard.

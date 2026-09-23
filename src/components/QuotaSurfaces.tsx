@@ -47,7 +47,7 @@ function WindowChrome({ mode, onSwitch, onWindowAction }: { mode: "main" | "comp
           </>
         )}
         <button className="s4-window-control s4-focus-target" type="button" aria-label={mode === "main" ? "Open compact mode" : "Open main window"} onClick={onSwitch}><CompactIcon /></button>
-        <button className="s4-window-control s4-focus-target" type="button" aria-label={mode === "compact" ? "Return to main window" : "Close S4Quota"} onClick={() => onWindowAction("close")}><CloseIcon /></button>
+        <button className="s4-window-control s4-focus-target" type="button" aria-label="Hide S4Quota to system tray" onClick={() => onWindowAction("close")}><CloseIcon /></button>
       </nav>
     </header>
   );
