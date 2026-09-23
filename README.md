@@ -1,5 +1,5 @@
 <div align="center">
-  <p><img src="docs/assets/s4quota-readme-mark-tile.svg" width="112" alt="S4Quota mark" /></p>
+  <p><img src="docs/assets/s4quota-readme-mark-tile.png" width="112" alt="S4Quota mark" /></p>
 
   <h1>S4Quota</h1>
   <p><strong>Personal AI capacity, at a glance.</strong></p>
