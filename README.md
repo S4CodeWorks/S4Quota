@@ -1,62 +1,92 @@
-# S4Quota
+<table align="center" border="0">
+  <tr><td align="center" bgcolor="#F4F4F0"><img src="assets/branding/s4quota-mark-primary.png" width="112" alt="S4Quota mark" /></td></tr>
+</table>
 
-**S4CodeWorks · Windows desktop utility · Development preview**
+<h1 align="center">S4Quota</h1>
 
-S4Quota keeps an individual’s available capacity across AI tools and agents in
-view while they work. The current provider is Codex, with live five-hour and
-weekly quota windows, remaining percentages, reset countdowns, and provider
-freshness and status.
+<p align="center"><strong>Personal AI capacity, at a glance.</strong></p>
 
-The product uses a provider-agnostic quota domain so additional tools can be
-added later without making Codex-specific protocol details part of the UI.
-Product and visual direction live in [PRODUCT.md](PRODUCT.md) and
-[DESIGN.md](DESIGN.md).
+<p align="center">A calm Windows desktop utility for seeing what AI capacity remains and when it resets.<br />
+By S4CodeWorks · Development preview</p>
+
+<p align="center">
+  <a href="#download-for-windows"><img alt="Download for Windows — coming soon" src="https://img.shields.io/badge/Download%20for%20Windows-coming%20soon-454640?style=flat-square&logo=windows&logoColor=white" /></a>
+  <a href="https://github.com/S4CodeWorks/S4Quota/releases"><img alt="Releases" src="https://img.shields.io/badge/Releases-view-77796F?style=flat-square" /></a>
+  <a href="docs/README.md"><img alt="Docs" src="https://img.shields.io/badge/Docs-read-77796F?style=flat-square" /></a>
+  <a href="docs/architecture.md"><img alt="Architecture" src="https://img.shields.io/badge/Architecture-view-77796F?style=flat-square" /></a>
+</p>
+
+<p align="center">
+  <img alt="Windows" src="https://img.shields.io/badge/platform-Windows-454640?style=flat-square&logo=windows&logoColor=white" />
+  <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-454640?style=flat-square" />
+  <img alt="Rust" src="https://img.shields.io/badge/backend-Rust-454640?style=flat-square&logo=rust&logoColor=white" />
+  <img alt="React and TypeScript" src="https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-454640?style=flat-square" />
+</p>
+
+## Download for Windows
+
+<table>
+  <tr>
+    <td>
+      <strong>Windows desktop · x64 · MSI / NSIS</strong><br />
+      The first public installer has not been published yet. When available, it will be attached to a GitHub Release.
+    </td>
+    <td align="right">
+      <a href="https://github.com/S4CodeWorks/S4Quota/releases"><strong>Check releases</strong></a>
+    </td>
+  </tr>
+</table>
+
+You can build the current preview locally with the steps in
+[Development](#development).
 
 ## Screenshots
 
-Real application screenshots are not versioned yet. The repository is ready
-for Main Dark, Main Light, Compact Dark, and Compact Light captures; see
-[`docs/screenshots/`](docs/screenshots/README.md). Impeccable comps under
-[`.impeccable/`](.impeccable/surfaces/main-compact.md) are composition records,
-not screenshots of the running application.
+Real application screenshots are not versioned yet. The capture slots are
+prepared for Main Dark, Main Light, Compact Dark, and Compact Light in
+[`docs/screenshots/`](docs/screenshots/README.md). The approved Impeccable comps
+are design references, not screenshots of the running application.
 
-## What is implemented
+## Features
 
-- Codex App Server integration over stdio JSON-RPC, using Codex’s existing sign-in.
-- Real five-hour and weekly quota data, with local reset countdowns.
-- Main and Compact desktop surfaces, including OS-aware Light and Dark themes.
-- Provider lifecycle and freshness states, manual refresh, and backend
-  reconciliation polling.
-- Windows process supervision with Job Object cleanup.
-- Windows MSI and NSIS bundle targets.
+- Live Codex five-hour and weekly quota windows.
+- Remaining capacity, reset countdowns, and provider freshness/state.
+- Main and Compact desktop surfaces with Light and Dark themes.
+- Manual refresh and 60-second backend reconciliation.
+- Windows process supervision and cleanup for the Codex App Server.
 
-Tray integration, autostart, final geometry persistence, release hardening, and
-additional providers remain planned.
+## What is S4Quota?
+
+S4Quota helps people who use AI agents and tools intensively understand their
+personal working capacity throughout the day and week: how much remains, when
+it returns, which limit is closer, and whether the displayed data is current.
+
+Codex is the first provider. The quota domain is provider-agnostic so other
+tools can be added later without coupling the product language or UI to Codex.
 
 ## Architecture
 
 ```text
 Codex
   → Codex App Server (stdio / JSON-RPC)
-  → CodexProvider (Rust adapter)
+  → CodexProvider (Rust)
   → ProviderManager (async task)
   → canonical ProviderState
-  → narrow Tauri commands and state events
-  → React Main / Compact
+  → Tauri IPC commands and state events
+  → React / TypeScript Main and Compact surfaces
 ```
 
-React and TypeScript present the published domain state and request actions such
-as refresh or surface switching. Rust owns the quota domain, provider lifecycle,
-process discovery and supervision, and normalization. Tauri connects the two
-and manages native desktop windows. See [architecture](docs/architecture.md) and
-[provider integration](docs/provider.md).
+React and TypeScript render the published state and request narrow actions.
+Rust owns the domain, provider lifecycle, quota normalization, and process
+supervision. Tauri connects them and manages native windows. More detail is in
+[docs/architecture.md](docs/architecture.md).
 
 ## Security
 
-S4Quota relies on the user’s existing Codex sign-in through the App Server. It
-does not read `auth.json` or authentication caches, persist credentials, or
-call private ChatGPT HTTP endpoints. Provider diagnostics are bounded and
-sanitized. The frontend cannot launch arbitrary processes.
+S4Quota uses the existing Codex sign-in through the local App Server. It does
+not read `auth.json` or authentication caches, store credentials, or call
+private ChatGPT HTTP endpoints. Diagnostics are bounded and sanitized, and the
+frontend cannot launch arbitrary processes.
 
 ## Development
 
@@ -72,16 +102,40 @@ cargo test --manifest-path src-tauri/Cargo.toml
 cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
 ```
 
-To run the sanitized live Codex validation, use the opt-in probe documented in
-[`docs/provider.md`](docs/provider.md). It requires Codex to be installed and
-signed in on the test machine.
+The live Codex provider probe is opt-in; see [docs/provider.md](docs/provider.md).
 
-## Windows builds
+Windows MSI and NSIS bundles are generated under
+`src-tauri/target/release/bundle/msi/` and
+`src-tauri/target/release/bundle/nsis/` by:
 
 ```powershell
 npm run tauri -- build
 ```
 
-Tauri writes Windows bundles under
-`src-tauri/target/release/bundle/`: NSIS installers go to `nsis/`, and MSI
-installers go to `msi/`. Build output and installers are excluded from Git.
+## Project Status
+
+**Implemented:** Codex provider, real five-hour and weekly quota data, Main and
+Compact surfaces, Light and Dark themes, Windows MSI/NSIS bundle targets.
+
+**Planned:** tray integration, autostart, final geometry persistence, release
+hardening, and additional providers.
+
+## Documentation
+
+- [Product definition](PRODUCT.md)
+- [Design System](DESIGN.md)
+- [Architecture](docs/architecture.md)
+- [Codex provider and security](docs/provider.md)
+- [Development and Windows builds](docs/development.md)
+- [Approved Main and Compact composition](.impeccable/surfaces/main-compact.md)
+- [Original provider spike and sanitized report](spike/codex-app-server/README.md)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, checks, and architectural
+boundaries.
+
+## License
+
+No license has been selected by S4CodeWorks yet; the repository currently has
+no `LICENSE` file.
