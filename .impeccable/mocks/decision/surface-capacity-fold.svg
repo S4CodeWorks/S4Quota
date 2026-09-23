@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <style>
+    text{font-family:"Source Sans 3","Segoe UI",sans-serif;fill:#171816} .num{font-variant-numeric:tabular-nums;letter-spacing:-1px}.label{font-size:13px;font-weight:600;letter-spacing:.8px}.meta{font-size:12px;fill:#666961}.rule{stroke:#d1d3cc;stroke-width:1}.dark text{fill:#f4f4f0}.dark .meta{fill:#9a9d94}.dark .rule{stroke:#343630}.cap{font-size:12px;fill:#4c4e47}.dark .cap{fill:#b7b9b1}.board-label{fill:#171816!important}.inverse{fill:#fafaf7!important}.inverse-meta{fill:#d1d3cc!important}
+  </style>
+  <rect width="1600" height="1000" fill="#dedfd9"/>
+  <text x="70" y="50" class="label">CAPACITY FOLD</text><text x="70" y="72" class="meta">Expanded limiting band · one attached weekly horizon · compact rail retained</text>
+  <rect x="70" y="100" width="1040" height="780" rx="10" fill="#fafaf7" stroke="#b7b9b1"/>
+  <rect x="70" y="100" width="1040" height="44" rx="10" fill="#f4f4f0"/><path d="M70 134h1040v10H70z" fill="#f4f4f0"/>
+  <text x="94" y="128" font-size="14" font-weight="600">S4Quota</text><circle cx="1021" cy="122" r="4" fill="#80837a"/><rect x="1046" y="118" width="9" height="9" fill="none" stroke="#666961"/><path d="M1080 118l9 9m0-9l-9 9" stroke="#666961"/>
+  <text x="112" y="194" font-size="12" font-weight="600" letter-spacing="1">CAPACITY</text>
+  <text x="1068" y="194" class="meta" text-anchor="end">Codex · current · updated 12:42</text>
+  <line x1="112" y1="218" x2="1068" y2="218" class="rule"/>
+  <text x="112" y="258" class="label">5 HOUR WINDOW</text><rect x="246" y="241" width="68" height="24" rx="12" fill="#171816"/><text x="280" y="258" font-size="11" fill="#fafaf7" text-anchor="middle" font-weight="600">LIMITING</text>
+  <text x="112" y="388" class="num" font-size="116" font-weight="600">72<tspan font-size="48">%</tspan></text><text x="116" y="426" class="cap">REMAINING</text>
+  <text x="1068" y="342" class="num" font-size="48" font-weight="600" text-anchor="end">02:14</text><text x="1068" y="372" class="cap" text-anchor="end">UNTIL RESET</text><text x="1068" y="402" class="meta" text-anchor="end">Today at 14:56</text>
+  <rect x="112" y="464" width="956" height="8" rx="2" fill="#dedfd9"/><rect x="112" y="464" width="688" height="8" rx="2" fill="#171816"/><rect x="796" y="454" width="2" height="28" fill="#171816"/><circle cx="797" cy="452" r="4" fill="#171816"/>
+  <text x="112" y="502" class="meta">NOW · 12:42</text><text x="1068" y="502" class="meta" text-anchor="end">RESET · 14:56</text>
+  <line x1="112" y1="538" x2="1068" y2="538" class="rule"/>
+  <text x="112" y="580" class="label">WEEKLY WINDOW</text><text x="112" y="650" class="num" font-size="56" font-weight="600">84<tspan font-size="26">%</tspan></text><text x="247" y="646" class="cap">REMAINING</text>
+  <text x="1068" y="626" class="num" font-size="32" font-weight="600" text-anchor="end">4d 08h</text><text x="1068" y="653" class="meta" text-anchor="end">Resets Thu, 17:00</text>
+  <line x1="112" y1="692" x2="1068" y2="692" class="rule"/>
+  <circle cx="120" cy="729" r="4" fill="#171816"/><text x="136" y="733" font-size="13">Live from Codex</text><text x="1068" y="733" class="meta" text-anchor="end">Provider details  ›</text>
+  <line x1="112" y1="766" x2="1068" y2="766" class="rule"/><text x="112" y="804" class="meta">The five-hour window is closest to limiting your work.</text><text x="1068" y="804" class="meta" text-anchor="end">Refresh</text>
+
+  <text x="1170" y="120" class="label">COMPACT · LIGHT</text>
+  <rect x="1170" y="140" width="360" height="150" rx="8" fill="#fafaf7" stroke="#b7b9b1"/>
+  <rect x="1170" y="140" width="360" height="30" rx="8" fill="#f4f4f0"/><text x="1186" y="160" font-size="11" font-weight="600">S4Quota</text><circle cx="1508" cy="155" r="3" fill="#666961"/>
+  <text x="1188" y="231" class="num" font-size="54" font-weight="600">72<tspan font-size="24">%</tspan></text><text x="1508" y="211" class="num" font-size="26" font-weight="600" text-anchor="end">02:14</text><text x="1508" y="231" class="meta" text-anchor="end">until reset</text>
+  <rect x="1188" y="260" width="320" height="5" rx="2" fill="#dedfd9"/><rect x="1188" y="260" width="230" height="5" rx="2" fill="#171816"/>
+
+  <g class="dark"><text x="1170" y="342" class="label board-label">COMPACT · DARK</text><rect x="1170" y="362" width="360" height="150" rx="8" fill="#171816" stroke="#343630"/><rect x="1170" y="362" width="360" height="30" rx="8" fill="#0f100e"/><text x="1186" y="382" font-size="11" font-weight="600">S4Quota</text><circle cx="1508" cy="377" r="3" fill="#9a9d94"/><text x="1188" y="453" class="num" font-size="54" font-weight="600">72<tspan font-size="24">%</tspan></text><text x="1508" y="433" class="num" font-size="26" font-weight="600" text-anchor="end">02:14</text><text x="1508" y="453" class="meta" text-anchor="end">until reset</text><rect x="1188" y="482" width="320" height="5" rx="2" fill="#343630"/><rect x="1188" y="482" width="230" height="5" rx="2" fill="#f4f4f0"/></g>
+  <text x="1170" y="566" class="label">STATE LANGUAGE</text>
+  <rect x="1170" y="586" width="360" height="66" rx="6" fill="#fafaf7" stroke="#80837a" stroke-dasharray="5 4"/><text x="1188" y="612" font-size="13" font-weight="600">72% · last known value</text><text x="1188" y="635" class="meta">Stale · reconnecting · updated 8m ago</text>
+  <rect x="1170" y="668" width="360" height="66" rx="6" fill="#fafaf7" stroke="#4c4e47"/><text x="1188" y="694" font-size="13" font-weight="600">Sign in to Codex</text><text x="1188" y="717" class="meta">Quota will appear after authentication</text><text x="1508" y="706" font-size="12" text-anchor="end">Open Codex</text>
+  <rect x="1170" y="750" width="360" height="66" rx="6" fill="#171816"/><text x="1188" y="776" class="inverse" font-size="13" font-weight="600">5h capacity exhausted</text><text x="1188" y="799" class="inverse-meta" font-size="12">Returns in 00:18</text>
+  <text x="1170" y="856" class="meta">Proposed Main: 960 × 680 minimum, 1040 × 780 shown</text><text x="1170" y="878" class="meta">Proposed Compact: 304 × 132 content, 360 × 150 specimen</text>
+</svg>

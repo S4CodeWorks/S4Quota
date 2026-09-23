@@ -38,10 +38,14 @@ impl Default for JsonRpcConfig {
 
 #[derive(Debug, Clone, Error, PartialEq, Eq)]
 pub enum RpcError {
+    #[error("spawn failure: {0}")]
+    Spawn(String),
     #[error("transport error: {0}")]
     Transport(String),
     #[error("JSON-RPC request timed out: {method}")]
     Timeout { method: String },
+    #[error("invalid JSON-RPC response: {0}")]
+    InvalidResponse(String),
     #[error("JSON-RPC {code}: {message}")]
     Remote { code: i64, message: String },
     #[error("app-server exited: {0}")]
@@ -99,7 +103,7 @@ impl JsonRpcClient {
             .kill_on_drop(true);
         let mut child = command
             .spawn()
-            .map_err(|error| RpcError::Transport(sanitize_text(&error.to_string())))?;
+            .map_err(|error| RpcError::Spawn(sanitize_text(&error.to_string())))?;
         let process_id = child
             .id()
             .ok_or_else(|| RpcError::Transport("spawned process has no process id".into()))?;
@@ -215,9 +219,13 @@ impl JsonRpcClient {
             })
             .await
             .map_err(|_| RpcError::ProcessExited("request dispatcher stopped".into()))?;
-        reply_rx
+        let result = reply_rx
             .await
-            .map_err(|_| RpcError::ProcessExited("request dispatcher stopped".into()))?
+            .map_err(|_| RpcError::ProcessExited("request dispatcher stopped".into()))?;
+        match result {
+            Ok(value) => Ok(value),
+            Err(error) => Err(self.enrich_process_error(error).await),
+        }
     }
 
     pub async fn notify(&self, method: &str, params: Option<Value>) -> Result<(), RpcError> {
@@ -230,9 +238,33 @@ impl JsonRpcClient {
             })
             .await
             .map_err(|_| RpcError::ProcessExited("request dispatcher stopped".into()))?;
-        reply_rx
+        let result = reply_rx
             .await
-            .map_err(|_| RpcError::ProcessExited("request dispatcher stopped".into()))?
+            .map_err(|_| RpcError::ProcessExited("request dispatcher stopped".into()))?;
+        match result {
+            Ok(()) => Ok(()),
+            Err(error) => Err(self.enrich_process_error(error).await),
+        }
+    }
+
+    async fn enrich_process_error(&self, error: RpcError) -> RpcError {
+        let RpcError::ProcessExited(reason) = error else {
+            return error;
+        };
+
+        let mut exit_rx = self.exit_rx.clone();
+        let current_exit = exit_rx.borrow().clone();
+        let exit = if let Some(exit) = current_exit {
+            Some(exit)
+        } else {
+            time::timeout(Duration::from_millis(500), wait_for_exit(&mut exit_rx))
+                .await
+                .ok()
+                .and_then(Result::ok)
+        };
+        time::sleep(Duration::from_millis(10)).await;
+        let stderr = self.stderr_diagnostics();
+        RpcError::ProcessExited(process_failure_summary(&reason, exit.as_ref(), &stderr))
     }
 
     pub async fn shutdown(self) -> Result<ShutdownResult, RpcError> {
@@ -317,6 +349,7 @@ enum Inbound {
 struct PendingRequest {
     method: String,
     deadline: Instant,
+    protocol_revision: usize,
     reply: oneshot::Sender<Result<Value, RpcError>>,
 }
 
@@ -330,6 +363,8 @@ async fn dispatcher_task(
 ) {
     let mut next_id = 1_u64;
     let mut pending = HashMap::<u64, PendingRequest>::new();
+    let mut protocol_revision = 0_usize;
+    let mut last_protocol_error: Option<String> = None;
     let mut timer = time::interval(Duration::from_millis(25));
     timer.set_missed_tick_behavior(MissedTickBehavior::Skip);
 
@@ -347,6 +382,7 @@ async fn dispatcher_task(
                     pending.insert(id, PendingRequest {
                         method,
                         deadline: Instant::now() + request_timeout,
+                        protocol_revision,
                         reply,
                     });
                 }
@@ -385,15 +421,27 @@ async fn dispatcher_task(
                         });
                     }
                 }
-                Some(Inbound::ProtocolError(_reason)) => {
+                Some(Inbound::ProtocolError(reason)) => {
                     protocol_errors.fetch_add(1, Ordering::Relaxed);
+                    protocol_revision = protocol_revision.saturating_add(1);
+                    last_protocol_error = Some(sanitize_text(&reason));
                 }
                 Some(Inbound::Closed(reason)) => {
-                    fail_pending(&mut pending, RpcError::ProcessExited(reason));
+                    fail_pending_after_close(
+                        &mut pending,
+                        &reason,
+                        protocol_revision,
+                        last_protocol_error.as_deref(),
+                    );
                     break;
                 }
                 None => {
-                    fail_pending(&mut pending, RpcError::ProcessExited("stdout reader stopped".into()));
+                    fail_pending_after_close(
+                        &mut pending,
+                        "stdout reader stopped",
+                        protocol_revision,
+                        last_protocol_error.as_deref(),
+                    );
                     break;
                 }
             },
@@ -404,7 +452,16 @@ async fn dispatcher_task(
                     .collect();
                 for id in expired {
                     if let Some(request) = pending.remove(&id) {
-                        let _ = request.reply.send(Err(RpcError::Timeout { method: request.method }));
+                        let error = if request.protocol_revision < protocol_revision {
+                            RpcError::InvalidResponse(
+                                last_protocol_error
+                                    .clone()
+                                    .unwrap_or_else(|| "malformed protocol frame".into()),
+                            )
+                        } else {
+                            RpcError::Timeout { method: request.method }
+                        };
+                        let _ = request.reply.send(Err(error));
                     }
                 }
             }
@@ -419,6 +476,39 @@ async fn dispatcher_task(
 fn fail_pending(pending: &mut HashMap<u64, PendingRequest>, error: RpcError) {
     for (_, request) in pending.drain() {
         let _ = request.reply.send(Err(error.clone()));
+    }
+}
+
+fn fail_pending_after_close(
+    pending: &mut HashMap<u64, PendingRequest>,
+    reason: &str,
+    protocol_revision: usize,
+    last_protocol_error: Option<&str>,
+) {
+    for (_, request) in pending.drain() {
+        let error = if request.protocol_revision < protocol_revision {
+            RpcError::InvalidResponse(
+                last_protocol_error
+                    .map(sanitize_text)
+                    .unwrap_or_else(|| "malformed protocol frame".into()),
+            )
+        } else {
+            RpcError::ProcessExited(sanitize_text(reason))
+        };
+        let _ = request.reply.send(Err(error));
+    }
+}
+
+fn process_failure_summary(reason: &str, exit: Option<&ProcessExit>, stderr: &str) -> String {
+    let reason = sanitize_text(reason);
+    let exit = exit
+        .map(ProcessExit::summary)
+        .unwrap_or_else(|| "exit code unavailable".into());
+    let stderr = sanitize_text(stderr.trim());
+    if stderr.is_empty() {
+        sanitize_text(&format!("{reason}; {exit}; stderr empty"))
+    } else {
+        sanitize_text(&format!("{reason}; {exit}; stderr: {stderr}"))
     }
 }
 
@@ -662,7 +752,7 @@ mod tests {
     #[tokio::test]
     async fn correlates_requests_times_out_and_drains_stderr() {
         let config = JsonRpcConfig {
-            request_timeout: Duration::from_millis(500),
+            request_timeout: Duration::from_secs(2),
             max_stderr_bytes: 4_096,
             ..Default::default()
         };
@@ -714,6 +804,42 @@ mod tests {
             .unwrap();
         assert_eq!(client.protocol_error_count(), 1);
         client.shutdown().await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn unexpected_exit_preserves_code_and_sanitized_stderr() {
+        let client = JsonRpcClient::spawn(fixture_command("crash-stderr"), Default::default())
+            .await
+            .unwrap();
+        let error = client
+            .request(
+                "initialize",
+                Some(json!({"clientInfo":{"name":"test","version":"0"}})),
+            )
+            .await
+            .unwrap_err();
+        let text = error.to_string();
+        assert!(matches!(error, RpcError::ProcessExited(_)));
+        assert!(text.contains("exit code 23"));
+        assert!(text.contains("[REDACTED]"));
+        assert!(text.contains("email=[REDACTED]"));
+        assert!(!text.contains("fixture-secret"));
+        assert!(!text.contains("fixture@example.com"));
+    }
+
+    #[tokio::test]
+    async fn malformed_response_is_distinct_from_eof_and_timeout() {
+        let client = JsonRpcClient::spawn(fixture_command("invalid-only"), Default::default())
+            .await
+            .unwrap();
+        let error = client
+            .request(
+                "initialize",
+                Some(json!({"clientInfo":{"name":"test","version":"0"}})),
+            )
+            .await
+            .unwrap_err();
+        assert!(matches!(error, RpcError::InvalidResponse(_)));
     }
 
     #[tokio::test]

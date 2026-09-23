@@ -63,29 +63,30 @@ impl Default for CodexProvider {
 impl CodexProvider {
     async fn discover_installation(&self) -> Result<CodexInstallation, ProviderFailure> {
         let output = time::timeout(Duration::from_secs(5), async {
-            let mut command = Command::new(if cfg!(windows) { "where.exe" } else { "which" });
+            let mut command = Command::new(locator_command());
             command.arg("codex");
             hide_window(&mut command);
             command.kill_on_drop(true).output().await
         })
-        .await
-        .map_err(|_| ProviderFailure::transient("Codex discovery timed out"))?
-        .map_err(|error| {
-            ProviderFailure::transient(format!(
-                "Codex discovery failed: {}",
-                sanitize_text(&error.to_string())
-            ))
-        })?;
+        .await;
 
-        if !output.status.success() {
-            return Err(unavailable("Codex executable was not found on PATH"));
+        let mut candidates = match output {
+            Ok(Ok(output)) if output.status.success() => String::from_utf8_lossy(&output.stdout)
+                .lines()
+                .map(str::trim)
+                .filter(|line| !line.is_empty())
+                .map(PathBuf::from)
+                .collect::<Vec<_>>(),
+            Ok(Ok(_)) | Ok(Err(_)) | Err(_) => Vec::new(),
+        };
+        #[cfg(windows)]
+        candidates.extend(desktop_codex_candidates());
+        deduplicate_candidates(&mut candidates);
+        if candidates.is_empty() {
+            return Err(unavailable(
+                "Codex executable was not found in PATH or the Codex Desktop installation",
+            ));
         }
-        let candidates: Vec<PathBuf> = String::from_utf8_lossy(&output.stdout)
-            .lines()
-            .map(str::trim)
-            .filter(|line| !line.is_empty())
-            .map(PathBuf::from)
-            .collect();
         let (path, kind) = select_candidate(&candidates)?;
         let version = collect_version(&path, kind).await;
         Ok(CodexInstallation {
@@ -99,7 +100,7 @@ impl CodexProvider {
         &self,
         installation: &CodexInstallation,
     ) -> Result<CodexSession, ProviderFailure> {
-        let command = codex_command(installation, &["app-server", "--stdio"])?;
+        let command = codex_command(installation, app_server_arguments())?;
         let client = JsonRpcClient::spawn(command, self.rpc_config.clone())
             .await
             .map_err(|error| classify_rpc_error(error, "spawn", installation.version.clone()))?;
@@ -112,6 +113,10 @@ impl CodexProvider {
             version: installation.version.clone(),
         })
     }
+}
+
+fn app_server_arguments() -> &'static [&'static str] {
+    &["app-server"]
 }
 
 pub struct CodexSession {
@@ -469,9 +474,41 @@ fn classify_rpc_error(error: RpcError, method: &str, version: Option<String>) ->
                 version,
             }
         }
+        RpcError::Spawn(message) => ProviderFailure {
+            kind: ProviderFailureKind::Transient,
+            message: format!("spawn failure: {}", sanitize_text(&message)),
+            version,
+        },
         RpcError::ProcessExited(message) => ProviderFailure {
             kind: ProviderFailureKind::ProcessExited,
-            message: sanitize_text(&message),
+            message: if method == "initialize" {
+                format!(
+                    "process exited before handshake completed: {}",
+                    sanitize_text(&message)
+                )
+            } else {
+                format!(
+                    "process exited during {method}: {}",
+                    sanitize_text(&message)
+                )
+            },
+            version,
+        },
+        RpcError::Timeout { .. } => ProviderFailure {
+            kind: ProviderFailureKind::Transient,
+            message: if method == "initialize" {
+                "App Server handshake timed out".into()
+            } else {
+                format!("App Server request timed out: {method}")
+            },
+            version,
+        },
+        RpcError::InvalidResponse(message) => ProviderFailure {
+            kind: ProviderFailureKind::Transient,
+            message: format!(
+                "invalid JSON-RPC response during {method}: {}",
+                sanitize_text(&message)
+            ),
             version,
         },
         other => ProviderFailure {
@@ -574,14 +611,112 @@ fn codex_command(
                 return Err(unavailable("Codex command shim failed trust validation"));
             }
             let mut command = Command::new(system_cmd());
-            command.args(["/d", "/s", "/c", "call"]);
-            command.arg(&installation.path);
+            command.args(["/d", "/c", "call"]);
+            command.arg(cmd_compatible_path(&installation.path));
             command
         }
     };
     command.args(arguments);
     hide_window(&mut command);
     Ok(command)
+}
+
+fn locator_command() -> PathBuf {
+    #[cfg(windows)]
+    {
+        return std::env::var_os("SystemRoot")
+            .map(PathBuf::from)
+            .map(|root| root.join("System32").join("where.exe"))
+            .filter(|path| path.is_file())
+            .unwrap_or_else(|| PathBuf::from("where.exe"));
+    }
+    #[cfg(not(windows))]
+    PathBuf::from("which")
+}
+
+#[cfg(windows)]
+fn desktop_codex_candidates() -> Vec<PathBuf> {
+    std::env::var_os("LOCALAPPDATA")
+        .map(PathBuf::from)
+        .map(|root| root.join("OpenAI").join("Codex").join("bin"))
+        .map(|root| desktop_codex_candidates_from(&root))
+        .unwrap_or_default()
+}
+
+#[cfg(windows)]
+fn desktop_codex_candidates_from(root: &Path) -> Vec<PathBuf> {
+    let mut candidates = Vec::new();
+    let direct = root.join("codex.exe");
+    if direct.is_file() {
+        candidates.push(direct);
+    }
+    if let Ok(entries) = std::fs::read_dir(root) {
+        for entry in entries.flatten() {
+            let candidate = entry.path().join("codex.exe");
+            if candidate.is_file() {
+                candidates.push(candidate);
+            }
+        }
+    }
+    candidates.sort_by(|left, right| {
+        modified_time(right)
+            .cmp(&modified_time(left))
+            .then_with(|| left.cmp(right))
+    });
+    candidates
+}
+
+#[cfg(windows)]
+fn modified_time(path: &Path) -> Option<SystemTime> {
+    std::fs::metadata(path)
+        .ok()
+        .and_then(|metadata| metadata.modified().ok())
+}
+
+fn deduplicate_candidates(candidates: &mut Vec<PathBuf>) {
+    let mut unique = Vec::<PathBuf>::new();
+    candidates.retain(|candidate| {
+        let normalized = candidate
+            .canonicalize()
+            .unwrap_or_else(|_| candidate.to_path_buf());
+        if unique.iter().any(|existing| existing == &normalized) {
+            false
+        } else {
+            unique.push(normalized);
+            true
+        }
+    });
+}
+
+fn cmd_compatible_path(path: &Path) -> PathBuf {
+    #[cfg(windows)]
+    {
+        let value = path.to_string_lossy();
+        if let Some(rest) = value.strip_prefix(r"\\?\UNC\") {
+            return PathBuf::from(format!(r"\\{rest}"));
+        }
+        if let Some(rest) = value.strip_prefix(r"\\?\") {
+            return PathBuf::from(rest);
+        }
+    }
+    path.to_path_buf()
+}
+
+#[cfg(test)]
+fn diagnostic_path(path: &Path) -> String {
+    let normalized = cmd_compatible_path(path);
+    for (variable, label) in [
+        ("LOCALAPPDATA", "%LOCALAPPDATA%"),
+        ("APPDATA", "%APPDATA%"),
+        ("USERPROFILE", "%USERPROFILE%"),
+    ] {
+        if let Some(root) = std::env::var_os(variable).map(PathBuf::from) {
+            if let Ok(relative) = normalized.strip_prefix(root) {
+                return sanitize_text(&PathBuf::from(label).join(relative).to_string_lossy());
+            }
+        }
+    }
+    sanitize_text(&normalized.to_string_lossy())
 }
 
 fn system_cmd() -> PathBuf {
@@ -602,11 +737,13 @@ mod tests {
     use super::*;
 
     fn discovery_fixture() -> PathBuf {
+        static NEXT_FIXTURE_ID: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
         let unique = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("s4quota-discovery-{unique}"));
+        let fixture_id = NEXT_FIXTURE_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        let root = std::env::temp_dir().join(format!("s4quota-discovery-{unique}-{fixture_id}"));
         std::fs::create_dir_all(&root).unwrap();
         root
     }
@@ -692,6 +829,35 @@ mod tests {
     }
 
     #[test]
+    fn process_failures_keep_handshake_phase_and_diagnostics_distinct() {
+        let spawn = classify_rpc_error(RpcError::Spawn("not found".into()), "spawn", None);
+        let exited = classify_rpc_error(
+            RpcError::ProcessExited("stdout reached EOF; exit code 1; stderr: fixture".into()),
+            "initialize",
+            Some("diagnostic".into()),
+        );
+        let timeout = classify_rpc_error(
+            RpcError::Timeout {
+                method: "initialize".into(),
+            },
+            "initialize",
+            None,
+        );
+        let invalid = classify_rpc_error(
+            RpcError::InvalidResponse("invalid JSON frame".into()),
+            "initialize",
+            None,
+        );
+
+        assert!(spawn.message.starts_with("spawn failure:"));
+        assert!(exited
+            .message
+            .starts_with("process exited before handshake completed:"));
+        assert_eq!(timeout.message, "App Server handshake timed out");
+        assert!(invalid.message.starts_with("invalid JSON-RPC response"));
+    }
+
+    #[test]
     fn discovery_prefers_native_and_accepts_only_a_known_npm_cmd_shim() {
         let root = discovery_fixture();
         let native = root.join("codex.exe");
@@ -715,6 +881,94 @@ node "%~dp0\node_modules\@openai\codex\bin\codex.js" %*
         let _ = std::fs::remove_dir_all(root);
     }
 
+    #[test]
+    fn production_spawn_arguments_use_default_stdio_transport() {
+        assert_eq!(app_server_arguments(), &["app-server"]);
+
+        let root = discovery_fixture();
+        let native = root.join("codex.exe");
+        std::fs::write(&native, b"fixture").unwrap();
+        let installation = CodexInstallation {
+            path: native.canonicalize().unwrap(),
+            kind: CodexExecutableKind::Native,
+            version: None,
+        };
+        let command = codex_command(&installation, app_server_arguments()).unwrap();
+        let arguments: Vec<String> = command
+            .as_std()
+            .get_args()
+            .map(|argument| argument.to_string_lossy().into_owned())
+            .collect();
+        assert_eq!(arguments, vec!["app-server"]);
+        assert!(!arguments.iter().any(|argument| argument == "--stdio"));
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn desktop_discovery_finds_versioned_native_installations() {
+        let root = discovery_fixture();
+        let build = root.join("build-id");
+        std::fs::create_dir_all(&build).unwrap();
+        let native = build.join("codex.exe");
+        std::fs::write(&native, b"fixture").unwrap();
+
+        let candidates = desktop_codex_candidates_from(&root);
+        assert_eq!(candidates, vec![native]);
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[cfg(windows)]
+    #[tokio::test]
+    async fn trusted_cmd_shim_works_with_job_object_and_canonical_path() {
+        let root = discovery_fixture();
+        let shim = root.join("codex.cmd");
+        let fixture = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("..")
+            .join("spike")
+            .join("codex-app-server")
+            .join("fixtures")
+            .join("fake-server.mjs");
+        std::fs::write(
+            &shim,
+            format!(
+                "@echo off\r\nREM node_modules\\@openai\\codex\\bin\\codex.js\r\nnode.exe \"{}\" normal %*\r\n",
+                fixture.display()
+            ),
+        )
+        .unwrap();
+        let installation = CodexInstallation {
+            path: shim.canonicalize().unwrap(),
+            kind: CodexExecutableKind::TrustedCmdShim,
+            version: None,
+        };
+        let command = codex_command(&installation, app_server_arguments()).unwrap();
+        let arguments: Vec<String> = command
+            .as_std()
+            .get_args()
+            .map(|argument| argument.to_string_lossy().into_owned())
+            .collect();
+        assert_eq!(arguments[0], "/d");
+        assert_eq!(arguments[1], "/c");
+        assert_eq!(arguments[2], "call");
+        assert!(!arguments[3].starts_with(r"\\?\"));
+        assert_eq!(arguments[4], "app-server");
+
+        let client = JsonRpcClient::spawn(command, JsonRpcConfig::default())
+            .await
+            .unwrap();
+        let response = client
+            .request(
+                "initialize",
+                Some(json!({"clientInfo":{"name":"test","version":"0"}})),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response["userAgent"], "fake");
+        client.shutdown().await.unwrap();
+        let _ = std::fs::remove_dir_all(root);
+    }
+
     #[tokio::test]
     #[ignore = "requires the installed Codex App Server and an authenticated account"]
     async fn live_provider_probe_is_sanitized() {
@@ -726,13 +980,20 @@ node "%~dp0\node_modules\@openai\codex\bin\codex.js" %*
         let installation = provider.discover().await.unwrap();
         let kind = installation.kind();
         let version = installation.version().map(str::to_owned);
+        let executable = diagnostic_path(&installation.path);
+        let working_directory = std::env::current_dir()
+            .map(|path| diagnostic_path(&path))
+            .unwrap_or_else(|_| "unavailable".into());
         let mut session = provider.spawn(&installation).await.unwrap();
         let process_id = session.process_id().unwrap();
         let job_object = session.job_object_active();
+        let initialize_sent = true;
         provider.initialize(&mut session).await.unwrap();
+        let initialize_responded = true;
         let first = provider.refresh(&mut session).await.unwrap();
         let second = provider.refresh(&mut session).await.unwrap();
         let (protocol_errors, stderr_bytes) = session.diagnostic_counts();
+        let sanitized_stderr = session.client.stderr_diagnostics();
 
         let durations: Vec<i64> = second
             .windows
@@ -758,7 +1019,8 @@ node "%~dp0\node_modules\@openai\codex\bin\codex.js" %*
         assert!(durations.contains(&10_080));
         assert!(all_percentages_valid);
 
-        session.shutdown().await.unwrap();
+        let CodexSession { client, .. } = session;
+        let shutdown = client.shutdown().await.unwrap();
         #[cfg(windows)]
         let orphaned = crate::windows_job::process_is_running(process_id);
         #[cfg(not(windows))]
@@ -794,7 +1056,12 @@ node "%~dp0\node_modules\@openai\codex\bin\codex.js" %*
             json!({
                 "result": "success",
                 "discovery": match kind { CodexExecutableKind::Native => "native", CodexExecutableKind::TrustedCmdShim => "trusted_cmd_shim" },
+                "executable": executable,
                 "versionDiagnostic": version,
+                "spawnArguments": app_server_arguments(),
+                "workingDirectory": working_directory,
+                "initializeSent": initialize_sent,
+                "initializeResponded": initialize_responded,
                 "authenticatedAccountRead": true,
                 "windowCount": second.windows.len(),
                 "durationMinutes": durations,
@@ -808,6 +1075,8 @@ node "%~dp0\node_modules\@openai\codex\bin\codex.js" %*
                 "jobObjectActive": job_object,
                 "protocolErrorCount": protocol_errors,
                 "sanitizedStderrBytes": stderr_bytes,
+                "sanitizedStderr": sanitized_stderr,
+                "exitCode": shutdown.exit.code,
                 "orphanedAfterShutdown": orphaned
             })
         );

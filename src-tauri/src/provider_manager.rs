@@ -28,6 +28,7 @@ pub struct ProviderFailure {
 }
 
 impl ProviderFailure {
+    #[allow(dead_code)]
     pub fn transient(message: impl Into<String>) -> Self {
         Self {
             kind: ProviderFailureKind::Transient,

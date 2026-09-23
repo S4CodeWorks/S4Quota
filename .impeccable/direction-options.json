@@ -1,0 +1,155 @@
+{
+  "title": "Escolha o mundo visual do S4Quota",
+  "question": "Quatro caminhos viáveis para uma identidade monocromática de longa permanência. Escolha um, adote o padrão da categoria ou peça uma nova rodada.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Chronometric Register",
+      "kicker": "THE ROLL",
+      "lineage": "folhas modernas de cronometragem e registros de precisão",
+      "thesis": "Capacidade aparece como tempo registrado: números estáveis, intervalos proporcionais e uma linha de agora sempre legível.",
+      "palette": ["#F5F5F2", "#171816", "#A2A39D", "#E5E6E1"],
+      "materials": ["superfície fosca", "réguas de tempo", "marcas de registro"],
+      "viewport": "Um specimen de foundations divide Light e Dark por uma única linha temporal, demonstrando números, intervalos, estados, foco e densidade sem compor Main ou Compact.",
+      "risk": "Pode parecer contábil ou excessivamente austero se o ritmo e as proporções não carregarem personalidade.",
+      "raised": [
+        {
+          "from": "Midnight Transit",
+          "raise": "A janela limitante recebe foco inequívoco sem apagar o contexto das demais janelas."
+        },
+        {
+          "from": "Civic Prospectus",
+          "raise": "Contraste alto é gasto em um único evento ou ação por vez, preservando silêncio ao redor."
+        },
+        {
+          "from": "Rhythm Machine",
+          "raise": "Mudanças percorrem uma linha temporal contínua; estado atual nunca depende de animação decorativa."
+        },
+        {
+          "from": "Gravity Garden",
+          "raise": "Causa e consequência mantêm direção visível: consumo leva ao limite; reset devolve capacidade."
+        },
+        {
+          "from": "Archive Wall",
+          "raise": "Rótulos e valores ocupam posições estáveis para leitura periférica e comparação rápida."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision/chronometric-register.png"
+    },
+    {
+      "id": "model-pick",
+      "label": "Calibrated Instrument",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "placas de metrologia e instrumentos de calibração",
+      "thesis": "O S4Quota se comporta como um instrumento calibrado: mede capacidade, explicita tolerância e mostra quando a leitura merece confiança.",
+      "palette": ["#F2F2EE", "#111210", "#858780", "#D8D9D3"],
+      "materials": ["placa de calibração", "intervalos gravados", "ponteiros semânticos"],
+      "viewport": "Um specimen de foundations usa a geometria interrompida da marca como disciplina para medidores, controles, números, estados e dois temas relacionados.",
+      "risk": "É o caminho mais naturalmente ligado à marca, mas pode cair em gauge literal, círculos demais ou fantasia de painel físico.",
+      "comp": ".impeccable/mocks/decision/calibrated-instrument.png"
+    },
+    {
+      "id": "challenger-exposure",
+      "label": "Exposure Record",
+      "verdict": "competitive",
+      "lineage": "registro de exposição de laboratório fotográfico",
+      "thesis": "Confiabilidade e pressão de quota aparecem como zonas tonais e camadas que revelam onde a leitura está segura, envelhecida ou em conflito.",
+      "palette": ["#FAFAF6", "#141412", "#777771", "#D0D0C9"],
+      "materials": ["rampa tonal", "folhas translúcidas", "hachuras de conflito"],
+      "viewport": "Um specimen de foundations organiza escala neutra, sobreposição, estados, campos numéricos e foco como uma ficha de exposição contemporânea.",
+      "case": "É tão forte quanto a direção atribuída para confiança e monocromia, mas menos sereno quando reduzido ao Compact e mais propenso a textura excessiva.",
+      "risk": "Camadas e hachuras podem cansar em uso prolongado ou transformar o produto em uma referência analógica literal.",
+      "comp": ".impeccable/mocks/decision/exposure-record.png",
+      "hero": "https://impeccable.style/worlds/cards/operate-b-exposure-record-zone-sheets-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/operate-b-exposure-record-zone-sheets.webp"
+    },
+    {
+      "id": "challenger-transit",
+      "label": "Midnight Transit",
+      "verdict": "declined",
+      "lineage": "wayfinding de sistemas metropolitanos",
+      "thesis": "Janelas de quota se tornam linhas com destino, transferência e ponto limitante.",
+      "palette": ["#111214", "#F3F3EF", "#9B9C96", "#D9DAD5"],
+      "materials": ["esmalte fosco", "linhas de rota", "nós de transferência"],
+      "viewport": "As janelas aparecem como rotas temporais convergindo no estado atual.",
+      "case": "A navegação é clara, mas linhas coloridas são parte estrutural do sistema original e a metáfora de viagem compete com capacidade pessoal.",
+      "kept": "Focar o corredor crítico preservando contexto periférico.",
+      "risk": "Pode parecer um aplicativo de transporte ou exigir cor para diferenciar o que o S4Quota deve resolver por hierarquia.",
+      "hero": "https://impeccable.style/worlds/cards/wayfinding-cartography-signage-midnight-transit-diagram-hero.webp"
+    },
+    {
+      "id": "challenger-civic",
+      "label": "Civic Prospectus",
+      "verdict": "declined",
+      "lineage": "prospectos corporativos cívicos tardo-modernos",
+      "thesis": "Grandes campos vazios fazem uma única medida parecer pública, clara e consequente.",
+      "palette": ["#F8F8F5", "#1A1A18", "#8C8D87", "#E7E7E2"],
+      "materials": ["placa clara", "faixa contínua", "hairlines institucionais"],
+      "viewport": "Um valor principal ocupa o campo enquanto detalhes se alinham em uma faixa inferior disciplinada.",
+      "case": "A calma funciona, porém a gramática original depende de gradiente e gesto promocional, inadequados a um utilitário persistente.",
+      "kept": "Gastar contraste em um único evento e deixar o restante respirar.",
+      "risk": "Pode parecer página institucional ou produto SaaS sofisticado em vez de ferramenta pessoal.",
+      "hero": "https://impeccable.style/worlds/cards/civic-bureau-prospectus-late-modern-hero.webp"
+    },
+    {
+      "id": "challenger-rhythm",
+      "label": "Rhythm Machine",
+      "verdict": "declined",
+      "lineage": "sequenciadores de passos do início dos anos 1980",
+      "thesis": "Consumo e reset formam um pulso visível ao longo de uma linha contínua de tempo.",
+      "palette": ["#151614", "#F1F1EC", "#8E9089", "#30312E"],
+      "materials": ["painel fosco", "passos físicos", "luz de andamento"],
+      "viewport": "Uma linha de passos representa consumo e restituição de capacidade.",
+      "case": "O ritmo é legível, mas a estética de máquina e LEDs colide diretamente com a rejeição a developer, terminal e performance visual.",
+      "kept": "Uma linha de tempo nunca quebra e sempre indica o agora.",
+      "risk": "Mesmo sem cor, pode parecer instrumento musical retrô ou painel hacker.",
+      "hero": "https://impeccable.style/worlds/cards/signals-instruments-drum-machine-step-row-hero.webp"
+    },
+    {
+      "id": "challenger-gravity",
+      "label": "Gravity Garden",
+      "verdict": "declined",
+      "lineage": "jardins surreais regidos por campos de gravidade",
+      "thesis": "Cada janela exerce uma força e a capacidade se desloca visivelmente em direção ao próximo limite.",
+      "palette": ["#EEEFEA", "#181916", "#989A92", "#CACBC5"],
+      "materials": ["campo vetorial", "trajetórias", "massas orbitais"],
+      "viewport": "Trajetórias mostram pressão relativa entre janelas e reset.",
+      "case": "A causalidade é expressiva, mas movimento contínuo e metáfora surreal prejudicam precisão, calma e leitura periférica.",
+      "kept": "Toda mudança visual deve revelar uma causa e um destino.",
+      "risk": "Pode parecer visualização artística e manter atenção quando deveria desaparecer no ambiente.",
+      "hero": "https://impeccable.style/worlds/cards/dream-surreal-impossible-worlds-gravity-rain-garden-hero.webp"
+    },
+    {
+      "id": "challenger-archive",
+      "label": "Archive Wall",
+      "verdict": "declined",
+      "lineage": "paredes de caixas catalogadas por etiquetas de ponta",
+      "thesis": "Providers e janelas ocupam posições estáveis numa grade de etiquetas, tornando variações fáceis de localizar.",
+      "palette": ["#F3F2ED", "#171715", "#85857F", "#DAD9D3"],
+      "materials": ["etiqueta impressa", "grade de inventário", "silhueta linear"],
+      "viewport": "Uma parede de rótulos organiza providers e janelas por posição fixa.",
+      "case": "A catalogação escala, mas caixas e coleções favorecem cards e inventário quando o v1 precisa de uma leitura temporal dominante.",
+      "kept": "Rótulos e valores permanecem no mesmo lugar através das mudanças.",
+      "risk": "Pode empurrar o produto para cards repetitivos e densidade administrativa.",
+      "hero": "https://impeccable.style/worlds/cards/textiles-weave-drape-fashion-sneaker-box-stacks-hero.webp"
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "O padrão da categoria",
+    "thesis": "Um utilitário Windows neutro com cards, barras de progresso e navegação lateral, executado com alto acabamento.",
+    "palette": ["#FAFAFA", "#181818", "#737373", "#E8E8E8"],
+    "materials": ["cards planos", "progress bars", "chrome discreto"],
+    "viewport": "Um specimen convencional mostra cards de quota, botões, estados e temas lado a lado.",
+    "risk": "É familiar e fácil de operar, mas indistinguível de dashboards SaaS e incapaz de construir memória própria.",
+    "comp": ".impeccable/mocks/decision/category-standard.png"
+  },
+  "steer": true
+}

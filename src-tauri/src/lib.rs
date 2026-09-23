@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use tauri::Emitter;
+use tauri::{Emitter, Manager, WebviewWindow};
 use tokio::sync::watch;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -68,6 +68,51 @@ pub struct AppState {
     settings: Mutex<AppSettings>,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+enum WindowAction {
+    Minimize,
+    ToggleMaximize,
+    Close,
+}
+
+fn set_visible_surface(app: &tauri::AppHandle, mode: &PresentationMode) -> Result<(), String> {
+    let main = app
+        .get_webview_window("main")
+        .ok_or_else(|| "main window is unavailable".to_string())?;
+    let compact = app
+        .get_webview_window("compact")
+        .ok_or_else(|| "compact window is unavailable".to_string())?;
+
+    match mode {
+        PresentationMode::Main => {
+            compact.hide().map_err(|error| error.to_string())?;
+            main.show().map_err(|error| error.to_string())?;
+            main.set_focus().map_err(|error| error.to_string())?;
+        }
+        PresentationMode::Compact => {
+            main.hide().map_err(|error| error.to_string())?;
+            compact.show().map_err(|error| error.to_string())?;
+            compact.set_focus().map_err(|error| error.to_string())?;
+        }
+    }
+    Ok(())
+}
+
+fn update_presentation_mode(
+    mode: PresentationMode,
+    state: &AppState,
+    app: &tauri::AppHandle,
+) -> Result<AppSettings, String> {
+    set_visible_surface(app, &mode)?;
+    let mut settings = state
+        .settings
+        .lock()
+        .map_err(|_| "settings lock poisoned".to_string())?;
+    settings.presentation_mode = mode;
+    Ok(settings.clone())
+}
+
 impl AppState {
     fn snapshot(&self) -> Result<AppSnapshot, String> {
         let provider = self.provider_state.borrow().clone();
@@ -78,6 +123,28 @@ impl AppState {
             .clone();
         Ok(AppSnapshot::from_canonical_provider(provider, settings))
     }
+}
+
+fn finish_after_provider_shutdown(
+    app: tauri::AppHandle,
+    handle: ProviderManagerHandle,
+    mut state: watch::Receiver<ProviderState>,
+) {
+    tauri::async_runtime::spawn(async move {
+        let _ = handle.send(ProviderCommand::Shutdown).await;
+        let _ = tokio::time::timeout(Duration::from_secs(4), async {
+            loop {
+                if matches!(*state.borrow(), ProviderState::Stopped) {
+                    break;
+                }
+                if state.changed().await.is_err() {
+                    break;
+                }
+            }
+        })
+        .await;
+        app.exit(0);
+    });
 }
 
 #[tauri::command]
@@ -120,13 +187,45 @@ fn update_settings(
 fn set_presentation_mode(
     mode: PresentationMode,
     state: tauri::State<'_, AppState>,
+    app: tauri::AppHandle,
 ) -> Result<AppSettings, String> {
-    let mut value = state
-        .settings
-        .lock()
-        .map_err(|_| "settings lock poisoned".to_string())?;
-    value.presentation_mode = mode;
-    Ok(value.clone())
+    update_presentation_mode(mode, &state, &app)
+}
+
+#[tauri::command]
+fn get_window_label(window: WebviewWindow) -> String {
+    window.label().to_string()
+}
+
+#[tauri::command]
+fn window_action(
+    action: WindowAction,
+    window: WebviewWindow,
+    state: tauri::State<'_, AppState>,
+    app: tauri::AppHandle,
+) -> Result<(), String> {
+    match action {
+        WindowAction::Minimize => window.minimize().map_err(|error| error.to_string()),
+        WindowAction::ToggleMaximize => {
+            let maximized = window.is_maximized().map_err(|error| error.to_string())?;
+            if maximized {
+                window.unmaximize().map_err(|error| error.to_string())
+            } else {
+                window.maximize().map_err(|error| error.to_string())
+            }
+        }
+        WindowAction::Close if window.label() == "compact" => {
+            update_presentation_mode(PresentationMode::Main, &state, &app).map(|_| ())
+        }
+        WindowAction::Close => {
+            finish_after_provider_shutdown(
+                app,
+                state.provider_handle.clone(),
+                state.provider_state.clone(),
+            );
+            Ok(())
+        }
+    }
 }
 
 #[cfg(test)]
@@ -194,7 +293,9 @@ pub fn run() {
             refresh_provider,
             get_settings,
             update_settings,
-            set_presentation_mode
+            set_presentation_mode,
+            get_window_label,
+            window_action
         ])
         .setup(move |app| {
             tauri::async_runtime::spawn(
@@ -225,24 +326,11 @@ pub fn run() {
             code: None, api, ..
         } if !shutdown_flag.swap(true, Ordering::SeqCst) => {
             api.prevent_exit();
-            let handle = event_handle.clone();
-            let app_handle = app_handle.clone();
-            let mut state = shutdown_state.clone();
-            tauri::async_runtime::spawn(async move {
-                let _ = handle.send(ProviderCommand::Shutdown).await;
-                let _ = tokio::time::timeout(Duration::from_secs(4), async {
-                    loop {
-                        if matches!(*state.borrow(), ProviderState::Stopped) {
-                            break;
-                        }
-                        if state.changed().await.is_err() {
-                            break;
-                        }
-                    }
-                })
-                .await;
-                app_handle.exit(0);
-            });
+            finish_after_provider_shutdown(
+                app_handle.clone(),
+                event_handle.clone(),
+                shutdown_state.clone(),
+            );
         }
         _ => {}
     });

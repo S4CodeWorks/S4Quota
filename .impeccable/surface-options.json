@@ -1,0 +1,49 @@
+{
+  "title": "Choose the composition of S4Quota",
+  "question": "Three related ways to compose Main and Compact inside the approved Tidal Almanac system. Choose the structure that should become the final Light/Dark specimen set.",
+  "options": [
+    {
+      "id": "capacity-fold",
+      "label": "Capacity Fold",
+      "kicker": "THE ROLL",
+      "lineage": "Measured field with an expanded limiting band",
+      "thesis": "The limiting five-hour window opens into the primary reading while the weekly horizon remains attached below it.",
+      "palette": ["#F4F4F0", "#FAFAF7", "#171816", "#D1D3CC"],
+      "materials": ["continuous warm-neutral field", "interrupted rules", "single cadence rail"],
+      "viewport": "Main is a 960 × 680 field with a 5h band occupying the upper reading zone; Compact is a 304 × 132 slice with 72% first, 02:14 second, and one quiet rail.",
+      "risk": "The rail must remain subordinate or the surface starts reading as monitoring software.",
+      "comp": ".impeccable/mocks/decision/surface-capacity-fold.png"
+    },
+    {
+      "id": "limiting-spine",
+      "label": "Limiting Spine",
+      "lineage": "A vertical reading spine linking now, reset, and the secondary window",
+      "thesis": "One strong vertical alignment makes the limiting condition readable as a continuous sequence rather than a collection of metrics.",
+      "palette": ["#F4F4F0", "#FAFAF7", "#171816", "#D1D3CC"],
+      "materials": ["ruled register", "shared numeric baseline", "edge marker"],
+      "viewport": "Main uses a 920 × 700 register with the primary percentage and reset on one spine; Compact is a 272 × 144 upright instrument without a chart.",
+      "risk": "The taller Compact footprint is less discreet near a screen corner.",
+      "comp": ".impeccable/mocks/decision/surface-limiting-spine.png"
+    },
+    {
+      "id": "optical-index",
+      "label": "Optical Index",
+      "lineage": "A disciplined index whose dominant row expands only as much as the data needs",
+      "thesis": "A compact register makes window comparison immediate and produces the quietest always-on-top surface.",
+      "palette": ["#F4F4F0", "#FAFAF7", "#171816", "#D1D3CC"],
+      "materials": ["baseline grid", "optical columns", "hairline separators"],
+      "viewport": "Main is a 900 × 640 optical ledger; Compact is a 264 × 104 number-and-countdown strip with no default chart.",
+      "risk": "Extreme restraint can understate the cyclical-capacity idea if the reset boundary is not explicit enough.",
+      "comp": ".impeccable/mocks/decision/surface-optical-index.png"
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": false,
+  "steer": true
+}

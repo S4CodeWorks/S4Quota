@@ -12,9 +12,33 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "S4Quota",
-        "width": 800,
-        "height": 600
+        "width": 960,
+        "height": 680,
+        "minWidth": 760,
+        "minHeight": 560,
+        "resizable": true,
+        "maximizable": true,
+        "decorations": false,
+        "shadow": true,
+        "visible": true
+      },
+      {
+        "label": "compact",
+        "title": "S4Quota Compact",
+        "width": 304,
+        "height": 120,
+        "minWidth": 280,
+        "minHeight": 112,
+        "resizable": false,
+        "maximizable": false,
+        "decorations": false,
+        "shadow": true,
+        "visible": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "focus": false
       }
     ],
     "security": {

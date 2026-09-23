@@ -1,0 +1,151 @@
+{
+  "title": "Escolha o mundo visual do S4Quota",
+  "question": "Nova mão: quatro sistemas diferentes dos anteriores, ainda monocromáticos, precisos e adequados a longas horas de uso.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Tidal Almanac",
+      "kicker": "THE ROLL",
+      "lineage": "tabelas de maré e almanaques hidrográficos contemporâneos",
+      "thesis": "Quota é uma capacidade cíclica: a interface mostra o nível disponível agora, o ponto limitante e o momento exato em que a capacidade retorna.",
+      "palette": ["#F4F4F0", "#161715", "#8D8F89", "#D9DAD4"],
+      "materials": ["bandas de nível", "curvas de cadência", "marcas de leitura"],
+      "viewport": "Um specimen de foundations cruza duas cadências — cinco horas e semana — em faixas monocromáticas, com números estáveis, estados, controles e Light/Dark sem desenhar Main ou Compact.",
+      "risk": "Pode virar metáfora ambiental ou gráfico decorativo se níveis, percentuais e reset deixarem de ser explícitos.",
+      "raised": [
+        {
+          "from": "Dense Mosaic",
+          "raise": "O sistema sustenta alta densidade quando necessário, mas cada zona mantém uma prioridade inequívoca."
+        },
+        {
+          "from": "Oscilloscope Bench",
+          "raise": "Cada linha e intervalo possui significado mensurável; nenhuma curva existe como decoração."
+        },
+        {
+          "from": "Tensegrity Column",
+          "raise": "A relação entre janelas revela qual restrição governa a capacidade total."
+        },
+        {
+          "from": "Closed-set Sleeve",
+          "raise": "Poucos elementos principais formam um conjunto fechado e ordenado, especialmente no Compact."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision/tidal-almanac.png"
+    },
+    {
+      "id": "model-pick",
+      "label": "Optical Proof",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "cartas ópticas e provas de resolução tipográfica",
+      "thesis": "O S4Quota prova sua própria legibilidade: contraste, escala e confiança são calibrados para que números críticos sobrevivam a qualquer tamanho e tema.",
+      "palette": ["#F6F6F2", "#121311", "#777973", "#D5D6D0"],
+      "materials": ["alvos de contraste", "escalas ópticas", "linhas de resolução"],
+      "viewport": "Um specimen de foundations testa números, labels, foco, estados, bordas e densidade em escalas progressivas, com Light/Dark pertencendo à mesma prova.",
+      "risk": "É extremamente coerente para um Design System, mas pode parecer clínico ou autoconsciente demais se a interface final herdar o aspecto de laboratório.",
+      "comp": ".impeccable/mocks/decision/optical-proof.png"
+    },
+    {
+      "id": "challenger-density",
+      "label": "Dense Mosaic",
+      "verdict": "competitive",
+      "lineage": "sites japoneses contemporâneos de alta densidade",
+      "thesis": "Muito mais informação cabe numa tela quando módulos, rótulos e hairlines obedecem a uma disciplina compacta em vez de inflar whitespace e cards.",
+      "palette": ["#FAFAF7", "#151613", "#777872", "#E1E2DC"],
+      "materials": ["mosaico modular", "hairlines contínuos", "abas compactas"],
+      "viewport": "Um specimen de foundations demonstra densidades confortável e compacta, números tabulares, estados e primitives numa grade contígua sem cards flutuantes.",
+      "case": "Vence em eficiência espacial e pode fortalecer o Compact, mas perde serenidade periférica e corre o risco de levar o v1 a uma densidade administrativa.",
+      "risk": "Pode cansar durante uso prolongado e fazer informação secundária competir com a quota limitante.",
+      "comp": ".impeccable/mocks/decision/dense-mosaic.png",
+      "hero": "https://impeccable.style/worlds/cards/japanese-high-density-web-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/japanese-high-density-web.webp"
+    },
+    {
+      "id": "challenger-sleeve",
+      "label": "Closed-set Sleeve",
+      "verdict": "declined",
+      "lineage": "capas de pop francês com conjunto pequeno e fechado",
+      "thesis": "Poucas janelas de quota recebem posições fixas e uma hierarquia editorial muito direta.",
+      "palette": ["#F3F3EF", "#171815", "#92948D", "#D7D8D2"],
+      "materials": ["campo plano", "bloco fechado", "ranking compacto"],
+      "viewport": "Cinco horas e semana aparecem como um conjunto curto e ordenado.",
+      "case": "A composição fechada é clara, mas o sistema original depende de retrato e cor saturada sem relação com a tarefa.",
+      "kept": "Tratar o Compact como um conjunto deliberadamente pequeno e fechado.",
+      "risk": "Pode parecer material promocional e não escala bem para histórico ou novos providers.",
+      "hero": "https://impeccable.style/worlds/cards/posters-covers-sleeves-yeye-pop-sleeve-hero.webp"
+    },
+    {
+      "id": "challenger-pixel",
+      "label": "Pixel Cabinet",
+      "verdict": "declined",
+      "lineage": "telas de arcade em grade inteira",
+      "thesis": "Tudo obedece a unidades inteiras e estados discretos, preservando nitidez em qualquer escala.",
+      "palette": ["#111210", "#F0F0EB", "#8A8C85", "#30312D"],
+      "materials": ["grade inteira", "estados discretos", "pixels de capacidade"],
+      "viewport": "Valores e estados se alinham numa grade rígida sem subpixel instável.",
+      "case": "A nitidez é útil, mas scanlines, pixels e glow são incompatíveis com a identidade e com a permanência calma.",
+      "kept": "Alinhamento numérico deve permanecer estável em pixels físicos e escalas de DPI.",
+      "risk": "Cai diretamente na estética retrô de developer tool que o produto rejeita.",
+      "hero": "https://impeccable.style/worlds/cards/medium-native-crt-arcade-pixel-glow-hero.webp"
+    },
+    {
+      "id": "challenger-scope",
+      "label": "Oscilloscope Bench",
+      "verdict": "declined",
+      "lineage": "osciloscópios em bancadas de sinais",
+      "thesis": "Duas janelas compartilham uma escala temporal e deixam visível quando a leitura está estável ou sem trigger.",
+      "palette": ["#141513", "#F0F0EA", "#898B84", "#32332F"],
+      "materials": ["graticule", "traço medido", "cursor temporal"],
+      "viewport": "Cadências de cinco horas e semana são sobrepostas numa grade mensurável.",
+      "case": "É tecnicamente expressivo, mas fosfor, knobs e leitura de bancada reforçam exatamente o estereótipo hacker/developer proibido.",
+      "kept": "Toda linha deve ser mensurável e todo estado de estabilidade deve ser explícito.",
+      "risk": "Pode parecer ferramenta de engenharia ou monitor de sinais em vez de utilitário pessoal.",
+      "hero": "https://impeccable.style/worlds/cards/scientific-notation-oscilloscope-signal-bench-hero.webp"
+    },
+    {
+      "id": "challenger-tensegrity",
+      "label": "Tension Field",
+      "verdict": "declined",
+      "lineage": "colunas de tensegridade e diagramas de força",
+      "thesis": "A janela limitante aparece como a força que governa todo o sistema, não como mais um cartão equivalente.",
+      "palette": ["#F0F0EC", "#171815", "#858780", "#CFD0CA"],
+      "materials": ["rede de tensão", "nós", "linhas de força"],
+      "viewport": "Relações entre janelas mostram onde a capacidade total está sob tensão.",
+      "case": "A dependência entre limites é valiosa, mas a forma espacial e o movimento respiratório tornam uma leitura simples abstrata demais.",
+      "kept": "A restrição dominante deve governar a hierarquia visual do conjunto.",
+      "risk": "Pode transformar dados diretos em um diagrama conceitual difícil de ler rapidamente.",
+      "hero": "https://impeccable.style/worlds/cards/kinetic-sculpture-automata-tensegrity-breathing-column-hero.webp"
+    },
+    {
+      "id": "challenger-industrial",
+      "label": "Quoted Industrial",
+      "verdict": "declined",
+      "lineage": "gramática industrial de etiquetas e nomes literais",
+      "thesis": "Estados e controles dizem exatamente o que são, com placas de rótulo impossíveis de confundir.",
+      "palette": ["#F5F5F1", "#151613", "#858780", "#D8D9D3"],
+      "materials": ["placas literais", "rótulos retos", "faixas estruturais"],
+      "viewport": "Cada primitive e estado recebe um nome literal e uma posição fixa.",
+      "case": "A honestidade dos rótulos ajuda, mas aspas, hazard stripes e linguagem de estoque são agressivas e performáticas.",
+      "kept": "Labels devem ser inequívocos e nunca depender de decoração para explicar estado.",
+      "risk": "Pode parecer moda industrial, painel de estoque ou estética developer deliberada.",
+      "hero": "https://impeccable.style/worlds/cards/textiles-weave-drape-fashion-industrial-quote-grammar-hero.webp"
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "O padrão da categoria",
+    "thesis": "Um utilitário Windows neutro com cards, barras de progresso e navegação lateral, executado com alto acabamento.",
+    "palette": ["#FAFAFA", "#181818", "#737373", "#E8E8E8"],
+    "materials": ["cards planos", "progress bars", "chrome discreto"],
+    "viewport": "Um specimen convencional mostra cards de quota, botões, estados e temas lado a lado.",
+    "risk": "É familiar e fácil de operar, mas indistinguível de dashboards SaaS e incapaz de construir memória própria.",
+    "comp": ".impeccable/mocks/decision/category-standard.png"
+  },
+  "steer": true
+}

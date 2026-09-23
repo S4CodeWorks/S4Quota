@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="860" viewBox="0 0 1440 860">
+  <style>
+    @font-face{font-family:S4Source;src:url('../../../node_modules/@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-normal.woff2') format('woff2')}
+    text{font-family:S4Source,"Segoe UI",sans-serif;fill:#171816}.num{font-variant-numeric:tabular-nums lining-nums;letter-spacing:-.025em}.meta{font-size:11px;fill:#666961}.label{font-size:12px;font-weight:600;letter-spacing:.015em}.note{font-size:13px;fill:#4c4e47}.inverse{fill:#f4f4f0}.inverse-meta{fill:#b7b9b1}.icon{fill:none;stroke:#4c4e47;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+  </style>
+  <rect width="1440" height="860" fill="#f4f4f0"/>
+  <text x="72" y="64" font-size="24" font-weight="600">Operational state specimens</text>
+  <text x="72" y="92" class="note">Values persist only when they remain truthful. Recovery replaces telemetry when no valid snapshot exists.</text>
+  <line x1="72" y1="120" x2="1368" y2="120" stroke="#d1d3cc"/>
+
+  <text x="72" y="162" class="label">REFRESHING</text><text x="72" y="184" class="note">Preserve the last valid snapshot.</text>
+  <rect x="72" y="208" width="360" height="142" rx="7" fill="#fafaf7" stroke="#d1d3cc"/>
+  <rect x="72" y="208" width="360" height="26" rx="7" fill="#e9eae5"/><text x="88" y="226" font-size="11" font-weight="600">S4Quota</text>
+  <text x="88" y="286" class="num" font-size="44" font-weight="600">72<tspan font-size="21">%</tspan></text><text x="416" y="270" class="num" font-size="24" font-weight="600" text-anchor="end">02:14</text><text x="416" y="286" class="meta" text-anchor="end">until reset</text>
+  <circle cx="92" cy="318" r="5" fill="none" stroke="#4c4e47" stroke-width="1.5" stroke-dasharray="10 7"/><text x="106" y="322" class="meta">Refreshing · last value retained</text>
+  <rect x="88" y="336" width="328" height="3" rx="1.5" fill="#dedfd9"/><rect x="88" y="336" width="236" height="3" rx="1.5" fill="#171816" opacity=".68"/>
+
+  <text x="540" y="162" class="label">STALE / DEGRADED</text><text x="540" y="184" class="note">State age and recovery become visible.</text>
+  <rect x="540" y="208" width="360" height="142" rx="7" fill="#fafaf7" stroke="#80837a" stroke-dasharray="5 4"/>
+  <rect x="540" y="208" width="360" height="26" rx="7" fill="#e9eae5"/><text x="556" y="226" font-size="11" font-weight="600">S4Quota</text>
+  <text x="556" y="286" class="num" font-size="44" font-weight="600" opacity=".72">72<tspan font-size="21">%</tspan></text><text x="884" y="270" class="num" font-size="24" font-weight="600" text-anchor="end" opacity=".72">02:14</text><text x="884" y="286" class="meta" text-anchor="end">last known reset</text>
+  <text x="556" y="322" class="meta">Stale · retrying · updated 8m ago</text>
+  <line x1="556" y1="337" x2="884" y2="337" stroke="#80837a" stroke-width="3" stroke-dasharray="6 4"/>
+
+  <text x="1008" y="162" class="label">AT LIMIT</text><text x="1008" y="184" class="note">Objective zero state; no invented threshold.</text>
+  <rect x="1008" y="208" width="360" height="142" rx="7" fill="#171816"/>
+  <rect x="1008" y="208" width="360" height="26" rx="7" fill="#0f100e"/><text x="1024" y="226" class="inverse" font-size="11" font-weight="600">S4Quota</text>
+  <text x="1024" y="286" class="num inverse" font-size="44" font-weight="600">0<tspan font-size="21">%</tspan></text><text x="1352" y="270" class="num inverse" font-size="24" font-weight="600" text-anchor="end">00:18</text><text x="1352" y="286" class="inverse-meta" font-size="11" text-anchor="end">until reset</text>
+  <text x="1024" y="322" class="inverse-meta" font-size="11">5h capacity exhausted · returns at 14:56</text><rect x="1024" y="336" width="328" height="3" rx="1.5" fill="#343630"/>
+
+  <line x1="72" y1="402" x2="1368" y2="402" stroke="#d1d3cc"/>
+  <text x="72" y="448" class="label">NEEDS AUTHENTICATION</text><text x="72" y="470" class="note">No value is shown without a valid account state.</text>
+  <rect x="72" y="494" width="360" height="142" rx="7" fill="#fafaf7" stroke="#4c4e47"/>
+  <text x="88" y="526" font-size="15" font-weight="600">Sign in to Codex</text><text x="88" y="550" class="meta">Quota appears after authentication.</text>
+  <rect x="88" y="574" width="104" height="36" rx="4" fill="#171816"/><text x="140" y="597" class="inverse" font-size="12" font-weight="600" text-anchor="middle">Open Codex</text>
+
+  <text x="540" y="448" class="label">UNAVAILABLE</text><text x="540" y="470" class="note">Process or connection failure with retry path.</text>
+  <rect x="540" y="494" width="360" height="142" rx="7" fill="#fafaf7" stroke="#d1d3cc"/>
+  <text x="556" y="526" font-size="15" font-weight="600">Codex is unavailable</text><text x="556" y="550" class="meta">Could not start the local provider.</text>
+  <rect x="556" y="574" width="84" height="36" rx="4" fill="none" stroke="#4c4e47"/><text x="598" y="597" font-size="12" font-weight="600" text-anchor="middle">Retry</text><text x="884" y="597" class="meta" text-anchor="end">View details</text>
+
+  <text x="1008" y="448" class="label">UNSUPPORTED</text><text x="1008" y="470" class="note">Capability mismatch, distinct from outage.</text>
+  <rect x="1008" y="494" width="360" height="142" rx="7" fill="#e9eae5"/>
+  <text x="1024" y="526" font-size="15" font-weight="600">Quota is not supported</text><text x="1024" y="550" class="meta">This Codex installation does not expose rate limits.</text>
+  <text x="1024" y="597" font-size="12" font-weight="600">View compatibility details</text>
+
+  <line x1="72" y1="688" x2="1368" y2="688" stroke="#d1d3cc"/>
+  <text x="72" y="728" class="label">MAIN SURFACE RULE</text>
+  <text x="72" y="754" class="note">The same semantics occupy the operational row beneath weekly capacity. Authentication, unavailable and unsupported replace the data field only when no canonical snapshot exists.</text>
+  <text x="72" y="794" class="meta">Approaching-limit language remains undefined until product policy supplies a defensible threshold.</text>
+  <text x="1368" y="826" class="meta" text-anchor="end">S4Quota · Capacity Fold state study</text>
+</svg>
