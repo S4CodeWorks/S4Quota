@@ -5,12 +5,14 @@ node_modules/
 dist/
 dist-ssr/
 .vite/
+coverage/
 *.local
 
 # Rust/Tauri build outputs
 target/
 src-tauri/target/
 src-tauri/bundle/
+.cargo-cache/
 
 # Generated installers and native packages
 *.msi
@@ -35,15 +37,25 @@ lerna-debug.log*
 *.bak
 *.swp
 
+# Local tool/session state (keep durable Impeccable decisions and comps)
+/.impeccable/questions/
+
+# Common local caches
+.cache/
+.eslintcache
+.parcel-cache/
+
 # Environment and credentials (never commit local secrets)
 .env
 .env.*
 !.env.example
 auth.json
 credentials.json
+tokens.json
 *.pem
 *.key
 *.p12
+*.pfx
 
 # Editor and OS files
 .vscode/*
