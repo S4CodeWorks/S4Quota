@@ -1,68 +1,55 @@
-<table align="center" border="0">
-  <tr><td align="center" bgcolor="#F4F4F0"><img src="assets/branding/s4quota-mark-primary.png" width="112" alt="S4Quota mark" /></td></tr>
-</table>
+<div align="center">
+  <table border="0">
+    <tr><td align="center" bgcolor="#F4F4F0"><img src="assets/branding/s4quota-mark-primary.png" width="88" alt="S4Quota mark" /></td></tr>
+  </table>
 
-<h1 align="center">S4Quota</h1>
+  <h1>S4Quota</h1>
+  <p><strong>Personal AI capacity, at a glance.</strong></p>
+  <p>A calm Windows desktop utility for tracking Codex capacity, reset times, and quota state without leaving your workflow.</p>
+  <p><sub>By S4CodeWorks · Windows 10/11 · x64 · Development preview</sub></p>
 
-<p align="center"><strong>Personal AI capacity, at a glance.</strong></p>
-
-<p align="center">A calm Windows desktop utility for seeing what AI capacity remains and when it resets.<br />
-By S4CodeWorks · Development preview</p>
-
-<p align="center">
-  <a href="#download-for-windows"><img alt="Download for Windows — coming soon" src="https://img.shields.io/badge/Download%20for%20Windows-coming%20soon-454640?style=flat-square&logo=windows&logoColor=white" /></a>
-  <a href="https://github.com/S4CodeWorks/S4Quota/releases"><img alt="Releases" src="https://img.shields.io/badge/Releases-view-77796F?style=flat-square" /></a>
-  <a href="docs/README.md"><img alt="Docs" src="https://img.shields.io/badge/Docs-read-77796F?style=flat-square" /></a>
-  <a href="docs/architecture.md"><img alt="Architecture" src="https://img.shields.io/badge/Architecture-view-77796F?style=flat-square" /></a>
-</p>
-
-<p align="center">
-  <img alt="Windows" src="https://img.shields.io/badge/platform-Windows-454640?style=flat-square&logo=windows&logoColor=white" />
-  <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-454640?style=flat-square" />
-  <img alt="Rust" src="https://img.shields.io/badge/backend-Rust-454640?style=flat-square&logo=rust&logoColor=white" />
-  <img alt="React and TypeScript" src="https://img.shields.io/badge/frontend-React%20%2B%20TypeScript-454640?style=flat-square" />
-</p>
+  <p><a href="https://github.com/S4CodeWorks/S4Quota/releases/latest/download/S4Quota-setup-x64.exe"><kbd>Download for Windows</kbd></a></p>
+  <p><sub><a href="https://github.com/S4CodeWorks/S4Quota/releases/latest/download/S4Quota-portable-x64.exe">Portable .exe</a> · <a href="https://github.com/S4CodeWorks/S4Quota/releases/latest/download/S4Quota-x64.msi">MSI</a> · <a href="https://github.com/S4CodeWorks/S4Quota/releases">All releases</a></sub></p>
+</div>
 
 ## Download for Windows
 
 <table>
+  <tr><th colspan="2" align="left">Windows 10/11 · x64</th></tr>
   <tr>
     <td>
-      <strong>Windows desktop · x64 · MSI / NSIS</strong><br />
-      The first public installer has not been published yet. When available, it will be attached to a GitHub Release.
+      <strong>Installer</strong><br />
+      Recommended · easiest setup<br /><br />
+      <a href="https://github.com/S4CodeWorks/S4Quota/releases/latest/download/S4Quota-setup-x64.exe"><strong>Download .exe</strong></a>
     </td>
-    <td align="right">
-      <a href="https://github.com/S4CodeWorks/S4Quota/releases"><strong>Check releases</strong></a>
+    <td>
+      <strong>Portable</strong><br />
+      No installation required<br /><br />
+      <a href="https://github.com/S4CodeWorks/S4Quota/releases/latest/download/S4Quota-portable-x64.exe"><strong>Download portable .exe</strong></a>
     </td>
   </tr>
+  <tr><td colspan="2">Prefer MSI? <a href="https://github.com/S4CodeWorks/S4Quota/releases/latest/download/S4Quota-x64.msi">Download the x64 MSI</a>.</td></tr>
 </table>
-
-You can build the current preview locally with the steps in
-[Development](#development).
 
 ## Screenshots
 
-Real application screenshots are not versioned yet. The capture slots are
-prepared for Main Dark, Main Light, Compact Dark, and Compact Light in
-[`docs/screenshots/`](docs/screenshots/README.md). The approved Impeccable comps
-are design references, not screenshots of the running application.
+Real application screenshots coming shortly.
 
-## Features
+<!-- Screenshot slots: docs/screenshots/main-dark.png, docs/screenshots/main-light.png, docs/screenshots/compact-dark.png, docs/screenshots/compact-light.png -->
+
+## Why S4Quota
+
+S4Quota helps people who rely on AI agents understand their personal working capacity: what remains, when it resets, which window is more limiting, and whether the information is current.
 
 - Live Codex five-hour and weekly quota windows.
 - Remaining capacity, reset countdowns, and provider freshness/state.
 - Main and Compact desktop surfaces with Light and Dark themes.
 - Manual refresh and 60-second backend reconciliation.
-- Windows process supervision and cleanup for the Codex App Server.
+- Windows process supervision for the Codex App Server.
 
-## What is S4Quota?
+## How it works
 
-S4Quota helps people who use AI agents and tools intensively understand their
-personal working capacity throughout the day and week: how much remains, when
-it returns, which limit is closer, and whether the displayed data is current.
-
-Codex is the first provider. The quota domain is provider-agnostic so other
-tools can be added later without coupling the product language or UI to Codex.
+S4Quota connects to the locally installed Codex App Server and uses its existing sign-in. It reconciles quota data periodically and on request, then presents remaining capacity and reset times in two desktop surfaces. Codex is the first provider; the product domain is designed to accommodate other tools later.
 
 ## Architecture
 
@@ -76,21 +63,21 @@ Codex
   → React / TypeScript Main and Compact surfaces
 ```
 
-React and TypeScript render the published state and request narrow actions.
-Rust owns the domain, provider lifecycle, quota normalization, and process
-supervision. Tauri connects them and manages native windows. More detail is in
-[docs/architecture.md](docs/architecture.md).
+React and TypeScript present published state and request narrow actions. Rust owns the domain, provider lifecycle, quota normalization, and process supervision. Tauri bridges the layers and manages native windows. See [Architecture](docs/architecture.md).
 
 ## Security
 
-S4Quota uses the existing Codex sign-in through the local App Server. It does
-not read `auth.json` or authentication caches, store credentials, or call
-private ChatGPT HTTP endpoints. Diagnostics are bounded and sanitized, and the
-frontend cannot launch arbitrary processes.
+S4Quota reuses the existing Codex sign-in through the local App Server. It does not read `auth.json` or authentication caches, persist credentials, or call private ChatGPT HTTP endpoints. Diagnostics are bounded and sanitized; the frontend cannot launch arbitrary processes.
+
+## Project status
+
+**Implemented:** Codex provider and real five-hour/weekly quota data; Main and Compact surfaces; Light and Dark themes; manual refresh and polling; Windows MSI and NSIS installers plus a portable executable.
+
+**Planned:** tray integration, autostart, final geometry persistence, release hardening, and additional providers.
 
 ## Development
 
-Requirements and setup details are in [docs/development.md](docs/development.md).
+Requirements and setup details are in [Development](docs/development.md).
 
 ```powershell
 npm ci
@@ -102,23 +89,7 @@ cargo test --manifest-path src-tauri/Cargo.toml
 cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
 ```
 
-The live Codex provider probe is opt-in; see [docs/provider.md](docs/provider.md).
-
-Windows MSI and NSIS bundles are generated under
-`src-tauri/target/release/bundle/msi/` and
-`src-tauri/target/release/bundle/nsis/` by:
-
-```powershell
-npm run tauri -- build
-```
-
-## Project Status
-
-**Implemented:** Codex provider, real five-hour and weekly quota data, Main and
-Compact surfaces, Light and Dark themes, Windows MSI/NSIS bundle targets.
-
-**Planned:** tray integration, autostart, final geometry persistence, release
-hardening, and additional providers.
+The live Codex provider probe is opt-in; see [Codex provider](docs/provider.md). Run `npm run tauri -- build` to generate the Windows bundles under `src-tauri/target/release/bundle/` (MSI and NSIS). Generated installers are not committed.
 
 ## Documentation
 
@@ -128,14 +99,12 @@ hardening, and additional providers.
 - [Codex provider and security](docs/provider.md)
 - [Development and Windows builds](docs/development.md)
 - [Approved Main and Compact composition](.impeccable/surfaces/main-compact.md)
-- [Original provider spike and sanitized report](spike/codex-app-server/README.md)
+- [Provider spike and sanitized report](spike/codex-app-server/README.md)
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, checks, and architectural
-boundaries.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, checks, and architectural boundaries.
 
 ## License
 
-No license has been selected by S4CodeWorks yet; the repository currently has
-no `LICENSE` file.
+No license has been selected by S4CodeWorks; the repository currently has no `LICENSE` file.
